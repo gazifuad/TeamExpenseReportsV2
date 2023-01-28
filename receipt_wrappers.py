@@ -62,11 +62,8 @@ class Receipt:
         msg = 'documentid' + '\t\t' + str(self.doc_id)
         msg += '\n' + 'users_index' + '\t\t' + str(self.users_index)
         msg += '\n' + 'image_filepath' + '\t\t' + str(self.image_filepath)
-        msg += '\n' + 'ocr_filepath' + '\t\t' + str(self.image_filepath)
+        msg += '\n' + 'ocr_filepath' + '\t\t' + str(self.ocr_filepath)
         return msg
-
-    def blag(self):
-        print("HSHSHS")
 
     def initialize_batch_receipts(data_folder_path, users_df):
         '''
