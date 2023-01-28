@@ -67,7 +67,7 @@ class Receipt:
         RETURN
             boolean whether new values were set
         '''
-        image_filepath_temp = self.data_folder_path + '\\img\\' + self.doc_id
+        image_filepath_temp = self.data_folder_path + '/img/' + self.doc_id
         if os.path.isfile(str(image_filepath_temp + '.jpg')):
             self.has_image = True
             self.image_filepath = image_filepath_temp + '.jpg'
@@ -86,7 +86,7 @@ class Receipt:
         RETURN
             boolean whether new values were set
         '''
-        ocr_filepath_temp = self.data_folder_path + '\\ocr\\' + self.doc_id + '.csv'
+        ocr_filepath_temp = self.data_folder_path + '/ocr/' + self.doc_id + '.csv'
         if os.path.isfile(ocr_filepath_temp):
             self.has_ocr = True
             self.ocr_filepath = ocr_filepath_temp
@@ -106,9 +106,9 @@ class Receipt:
             list of the Receipt objects initialized based on receipts found in Data folder
         '''
         collected_doc_ids = set([did for did in users_df.loc[:, 'documentid']])
-        collected_doc_ids = collected_doc_ids.union(set([did[: -4] for did in os.listdir(data_folder_path + '\\ocr') if did[-4] == '.csv']))
+        collected_doc_ids = collected_doc_ids.union(set([did[: -4] for did in os.listdir(data_folder_path + '/ocr') if did[-4] == '.csv']))
 
-        for did_raw in os.listdir(data_folder_path + '\\img'):
+        for did_raw in os.listdir(data_folder_path + '/img'):
             if did_raw[-4] == ',jpg':
                 if '(1)' == did_raw[-7 : -4]:
                     did = did_raw[: -7]
