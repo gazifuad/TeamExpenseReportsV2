@@ -109,12 +109,12 @@ class Receipt:
         collected_doc_ids = collected_doc_ids.union(set([did[: -4] for did in os.listdir(data_folder_path + '/ocr') if did[-4] == '.csv']))
 
         for did_raw in os.listdir(data_folder_path + '/img'):
-            if did_raw[-4] == ',jpg':
+            if did_raw[-4] == '.jpg':
                 if '(1)' == did_raw[-7 : -4]:
                     did = did_raw[: -7]
                 else:
                     did = did_raw[: -4]
-                collected_doc_ids = collected_doc_ids.union([did])
+                collected_doc_ids = collected_doc_ids.union(set([did]))
         return [Receipt(data_folder_path, did, users_df) for did in collected_doc_ids]
 
 
