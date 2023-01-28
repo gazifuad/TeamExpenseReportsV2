@@ -5,8 +5,8 @@ class Receipt:
     '''
     Wrapper class around each receipt.
     '''
-    data_folder_path = ""       # string filepath to the Data folder containing all receipts
-    doc_id = ""                 # string documentid of this receipt
+    data_folder_path = ''       # string filepath to the Data folder containing all receipts
+    doc_id = ''                 # string documentid of this receipt
 
     has_user = False            # boolean whether Users.csv contains a line for this receipt 
     has_image = False           # boolean whether Data\img contains an image for this receipt
@@ -109,11 +109,15 @@ class Receipt:
         '''
         Parses the text in the ocr_filepath and stores in self.ocr_str
         '''
-        tsv_df = pd.read_csv(self.ocr_filepath, sep='\t')
-        self.ocr_str = ''
-        for strline in tsv_df.values.tolist():
-            self.ocr_str += ' ' + strline[0].strip() + ' '
-        self.ocr_str = self.ocr_str.strip()
+        try:
+            tsv_df = pd.read_csv(self.ocr_filepath, sep='\t')
+            self.ocr_str = ''
+            for strline in tsv_df.values.tolist():
+                self.ocr_str += ' ' + strline[0].strip() + ' '
+            self.ocr_str = self.ocr_str.strip()
+        except:
+            self.has_ocr = False
+            self.ocr_str = None
 
     def parse_user_csv(self):
         '''
