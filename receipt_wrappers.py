@@ -91,6 +91,13 @@ class Receipt:
             self.has_ocr = True
             self.ocr_filepath = ocr_filepath_temp
             return True
+
+        ocr_filepath_temp = self.data_folder_path + '/ocr-2/' + self.doc_id + '.csv'
+        if os.path.isfile(ocr_filepath_temp):
+            self.has_ocr = True
+            self.ocr_filepath = ocr_filepath_temp
+            return True
+            
         self.has_ocr = False
         self.ocr_filepath = None
         return False
