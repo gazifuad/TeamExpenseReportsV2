@@ -16,7 +16,9 @@ class Receipt:
     image_filepath = None       # string filepath to this receipt's image
     ocr_filepath = None         # string filepath to this receipt's ocr csv output
 
-    ocr_str = None              # the string in the associated ocr file    
+    ocr_str = None              # the string in the associated ocr file  
+    ocr_date = ""               # the full date, if found, in the OCR
+    ocr_year = ""                # the year, if found, in the OCR
     users_amount = None          # the monetary amount in the User.csv file
     users_vendor = None          # the vendor name in the User.csv file
     users_address = None         # the vendor address in the User.csv file
@@ -35,6 +37,7 @@ class Receipt:
         self.set_user_index(users_df)
         self.set_img_filepath()
         self.set_ocr_filepath()
+        self.set_ocr_date()
         if self.has_ocr:
             self.parse_ocr_tsv()
         if self.has_user:
@@ -104,6 +107,23 @@ class Receipt:
         self.has_ocr = False
         self.ocr_filepath = None
         return False
+    
+    def set_ocr_date(self):
+        '''
+        Finds the year, if there is one, and full date for this receipt
+        '''
+        dates = pd.read_csv("dates.csv")
+        dates = dates.fillna("")
+        try:
+            dates.set_index("documentid")
+            dates = dates.set_index("documentid")
+            self.ocr_date = dates.loc[self.doc_id].values[0]
+        except:
+            return False
+        if (self.ocr_date != ""):
+            self.ocr_year = self.ocr_date[:4]
+        return True
+
 
     def parse_ocr_tsv(self):
         '''
