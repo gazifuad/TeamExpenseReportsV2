@@ -13,8 +13,8 @@ class Receipt:
     has_ocr = False             # boolean whether Data\csv contains an image for this receipt
 
     users_index = None          # integer index of this receipt in Users.csv
-    image_filepath = ""         # string filepath to this receipt's image
-    ocr_filepath = ""           # string filepath to this receipt's ocr csv output
+    image_filepath = None       # string filepath to this receipt's image
+    ocr_filepath = None         # string filepath to this receipt's ocr csv output
 
 
     def __init__(self, data_folder_path, doc_id, users_df):
@@ -47,7 +47,7 @@ class Receipt:
             self.image_filepath = image_filepath_temp
         else:
             self.has_image = False
-            self.image_filepath = False
+            self.image_filepath = None
 
         # Get path to .csv OCR text output
         ocr_filepath_temp = data_folder_path + '\\ocr\\' + doc_id + '.csv'
@@ -59,6 +59,9 @@ class Receipt:
             self.ocr_filepath = None
         
     def __str__(self):
+        '''
+        Returns string representation of this receipt
+        '''
         msg = 'documentid' + '\t\t' + str(self.doc_id)
         msg += '\n' + 'users_index' + '\t\t' + str(self.users_index)
         msg += '\n' + 'image_filepath' + '\t\t' + str(self.image_filepath)
