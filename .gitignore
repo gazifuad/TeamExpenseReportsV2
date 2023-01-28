@@ -1,4 +1,6 @@
 venv/
+__pycache__/
+.ipynb_checkpoints/
 zoesplayground.ipynb
 nikhazsplayground.ipynb
 georgeplayground.ipynb
