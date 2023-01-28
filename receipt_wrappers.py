@@ -17,6 +17,9 @@ class Receipt:
     ocr_filepath = None         # string filepath to this receipt's ocr csv output
 
     ocr_str = None              # the string in the associated ocr file    
+    users_amount = None          # the monetary amount in the User.csv file
+    users_vendor = None          # the vendor name in the User.csv file
+    users_address = None         # the vendor address in the User.csv file
 
 
     def __init__(self, data_folder_path, doc_id, users_df):
@@ -34,6 +37,8 @@ class Receipt:
         self.set_ocr_filepath()
         if self.has_ocr:
             self.parse_ocr_tsv()
+        if self.has_user:
+            self.parse_user_csv()
 
     def __str__(self):
         '''
@@ -109,6 +114,15 @@ class Receipt:
         for strline in tsv_df.values.tolist():
             self.ocr_str += ' ' + strline[0].strip() + ' '
         self.ocr_str = self.ocr_str.strip()
+
+    def parse_user_csv(self):
+        '''
+        Parses the fields in User.csv and stores results in self.users_amount, self.users_vendor, self.users_address
+        '''
+        csv_df = pd.read_csv(self.data_folder_path + '/Users.csv')
+        self.users_amount = csv_df.loc[self.users_index, 'amount']
+        self.users_vendor = csv_df.loc[self.users_index, 'vendor_name']
+        self.users_address = csv_df.loc[self.users_index, 'vendor_address']
 
     def initialize_batch_receipts(data_folder_path, users_df):
         '''
