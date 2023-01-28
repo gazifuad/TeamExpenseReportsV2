@@ -42,6 +42,7 @@ jupyter_client==8.0.1
 jupyter_core==5.1.5
 kiwisolver==1.4.4
 langcodes==3.3.0
+locationtagger==0.0.1
 lxml==4.9.2
 MarkupSafe==2.1.2
 matplotlib==3.6.3
@@ -64,6 +65,7 @@ prompt-toolkit==3.0.36
 psutil==5.9.4
 ptyprocess==0.7.0
 pure-eval==0.2.2
+pycountry==22.3.5
 pydantic==1.10.4
 Pygments==2.14.0
 pylatexenc==2.10
@@ -111,4 +113,6 @@ typing_extensions==4.4.0
 urllib3==1.26.14
 wasabi==1.1.1
 wcwidth==0.2.6
+xx-ent-wiki-sm @ https://github.com/explosion/spacy-models/releases/download/xx_ent_wiki_sm-3.5.0/xx_ent_wiki_sm-3.5.0-py3-none-any.whl
+xx-sent-ud-sm @ https://github.com/explosion/spacy-models/releases/download/xx_sent_ud_sm-3.5.0/xx_sent_ud_sm-3.5.0-py3-none-any.whl
 zipp==3.12.0
