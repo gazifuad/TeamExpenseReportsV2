@@ -41,10 +41,13 @@ class Receipt:
             self.users_index = users_indices[0]
 
         # Get path to .jpg receipt image
-        image_filepath_temp = data_folder_path + '\\img\\' + doc_id + '.jpg'
-        if os.path.isfile(image_filepath_temp):
+        image_filepath_temp = data_folder_path + '\\img\\' + doc_id
+        if os.path.isfile(str(image_filepath_temp + '.jpg')):
             self.has_image = True
-            self.image_filepath = image_filepath_temp
+            self.image_filepath = image_filepath_temp + '.jpg'
+        elif os.path.isfile(str(image_filepath_temp + '(1).jpg')):
+            self.has_image = True
+            self.image_filepath = image_filepath_temp + '(1).jpg'
         else:
             self.has_image = False
             self.image_filepath = None
