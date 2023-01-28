@@ -27,40 +27,10 @@ class Receipt:
         '''
         self.data_folder_path = data_folder_path
         self.doc_id = doc_id
+        self.set_user_index(users_df)
+        self.set_img_filepath()
+        self.set_ocr_filepath()
 
-        # Find row index in Users.csv
-        users_indices = users_df.index[users_df['documentid']==self.doc_id].tolist()
-        if len(users_indices) == 0:
-            self.has_user = False
-            self.users_index = None
-        elif len(users_indices) >= 2:
-            self.has_user = True
-            raise Exception('Users.csv contains documentid twice: ' + str(self.doc_id))
-        else:
-            self.has_user = True
-            self.users_index = users_indices[0]
-
-        # Get path to .jpg receipt image
-        image_filepath_temp = data_folder_path + '\\img\\' + doc_id
-        if os.path.isfile(str(image_filepath_temp + '.jpg')):
-            self.has_image = True
-            self.image_filepath = image_filepath_temp + '.jpg'
-        elif os.path.isfile(str(image_filepath_temp + '(1).jpg')):
-            self.has_image = True
-            self.image_filepath = image_filepath_temp + '(1).jpg'
-        else:
-            self.has_image = False
-            self.image_filepath = None
-
-        # Get path to .csv OCR text output
-        ocr_filepath_temp = data_folder_path + '\\ocr\\' + doc_id + '.csv'
-        if os.path.isfile(ocr_filepath_temp):
-            self.has_ocr = True
-            self.ocr_filepath = ocr_filepath_temp
-        else:
-            self.has_ocr = False
-            self.ocr_filepath = None
-        
     def __str__(self):
         '''
         Returns string representation of this receipt
@@ -70,6 +40,60 @@ class Receipt:
         msg += '\n' + 'image_filepath' + '\t\t' + str(self.image_filepath)
         msg += '\n' + 'ocr_filepath' + '\t\t' + str(self.ocr_filepath)
         return msg
+
+    def set_user_index(self, users_df):
+        '''
+        Sets self.user_index and self.has_user based on given users_df
+        INPUT
+            users_df; pandas dataframe of Users.csv
+        RETURN
+            boolean whether new values were set
+        '''
+        users_indices = users_df.index[users_df['documentid']==self.doc_id].tolist()
+        if len(users_indices) == 0:
+            self.has_user = False
+            self.users_index = None
+            return False
+        if len(users_indices) >= 2:
+            self.has_user = True
+            raise Exception('Users.csv contains documentid twice: ' + str(self.doc_id))
+        self.has_user = True
+        self.users_index = users_indices[0]
+        return True
+
+    def set_img_filepath(self):
+        '''
+        Sets self.img_filepath and self.has_img based on files in self.data_folder_path director
+        RETURN
+            boolean whether new values were set
+        '''
+        image_filepath_temp = self.data_folder_path + '\\img\\' + self.doc_id
+        if os.path.isfile(str(image_filepath_temp + '.jpg')):
+            self.has_image = True
+            self.image_filepath = image_filepath_temp + '.jpg'
+            return True
+        if os.path.isfile(str(image_filepath_temp + '(1).jpg')):
+            self.has_image = True
+            self.image_filepath = image_filepath_temp + '(1).jpg'
+            return True
+        self.has_image = False
+        self.image_filepath = None    
+        return False    
+    
+    def set_ocr_filepath(self):
+        '''
+        Sets self.ocr_filepath and self.has_ocr based on files in self.data_folder_path director
+        RETURN
+            boolean whether new values were set
+        '''
+        ocr_filepath_temp = self.data_folder_path + '\\ocr\\' + self.doc_id + '.csv'
+        if os.path.isfile(ocr_filepath_temp):
+            self.has_ocr = True
+            self.ocr_filepath = ocr_filepath_temp
+            return True
+        self.has_ocr = False
+        self.ocr_filepath = None
+        return False
 
     def initialize_batch_receipts(data_folder_path, users_df):
         '''
@@ -82,8 +106,15 @@ class Receipt:
             list of the Receipt objects initialized based on receipts found in Data folder
         '''
         collected_doc_ids = set([did for did in users_df.loc[:, 'documentid']])
-        collected_doc_ids = collected_doc_ids.union(set([did[: -4] for did in os.listdir(data_folder_path + '\\img')]))
-        collected_doc_ids = collected_doc_ids.union(set([did[: -4] for did in os.listdir(data_folder_path + '\\ocr')]))
+        collected_doc_ids = collected_doc_ids.union(set([did[: -4] for did in os.listdir(data_folder_path + '\\ocr') if did[-4] == '.csv']))
+
+        for did_raw in os.listdir(data_folder_path + '\\img'):
+            if did_raw[-4] == ',jpg':
+                if '(1)' == did_raw[-7 : -4]:
+                    did = did_raw[: -7]
+                else:
+                    did = did_raw[: -4]
+                collected_doc_ids = collected_doc_ids.union([did])
         return [Receipt(data_folder_path, did, users_df) for did in collected_doc_ids]
 
 
