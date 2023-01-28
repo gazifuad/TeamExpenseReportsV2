@@ -58,6 +58,16 @@ class Receipt:
             self.has_ocr = False
             self.ocr_filepath = None
         
+    def __str__(self):
+        msg = 'documentid' + '\t\t' + str(self.doc_id)
+        msg += '\n' + 'users_index' + '\t\t' + str(self.users_index)
+        msg += '\n' + 'image_filepath' + '\t\t' + str(self.image_filepath)
+        msg += '\n' + 'ocr_filepath' + '\t\t' + str(self.image_filepath)
+        return msg
+
+    def blag(self):
+        print("HSHSHS")
+
     def initialize_batch_receipts(data_folder_path, users_df):
         '''
         STATIC METHOD. NOT TIED TO AN INSTANCE OF RECEIPT.
@@ -71,7 +81,6 @@ class Receipt:
         collected_doc_ids = set([did for did in users_df.loc[:, 'documentid']])
         collected_doc_ids = collected_doc_ids.union(set([did[: -4] for did in os.listdir(data_folder_path + '\\img')]))
         collected_doc_ids = collected_doc_ids.union(set([did[: -4] for did in os.listdir(data_folder_path + '\\ocr')]))
-
         return [Receipt(data_folder_path, did, users_df) for did in collected_doc_ids]
 
 
