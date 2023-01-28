@@ -16,7 +16,7 @@ class Receipt:
     image_filepath = None       # string filepath to this receipt's image
     ocr_filepath = None         # string filepath to this receipt's ocr csv output
 
-    
+    ocr_str = None              # the string in the associated ocr file    
 
 
     def __init__(self, data_folder_path, doc_id, users_df):
@@ -32,6 +32,8 @@ class Receipt:
         self.set_user_index(users_df)
         self.set_img_filepath()
         self.set_ocr_filepath()
+        if self.has_ocr:
+            self.parse_ocr_tsv()
 
     def __str__(self):
         '''
@@ -88,13 +90,7 @@ class Receipt:
         RETURN
             boolean whether new values were set
         '''
-        ocr_filepath_temp = self.data_folder_path + '/ocr-3/' + self.doc_id + '.csv'
-        if os.path.isfile(ocr_filepath_temp):
-            self.has_ocr = True
-            self.ocr_filepath = ocr_filepath_temp
-            return True
-
-        ocr_filepath_temp = self.data_folder_path + '/ocr-2/' + self.doc_id + '.csv'
+        ocr_filepath_temp = self.data_folder_path + '/ocr-3/' + self.doc_id + '.tsv'
         if os.path.isfile(ocr_filepath_temp):
             self.has_ocr = True
             self.ocr_filepath = ocr_filepath_temp
@@ -103,6 +99,16 @@ class Receipt:
         self.has_ocr = False
         self.ocr_filepath = None
         return False
+
+    def parse_ocr_tsv(self):
+        '''
+        Parses the text in the ocr_filepath and stores in self.ocr_str
+        '''
+        tsv_df = pd.read_csv(self.ocr_filepath, sep='\t')
+        self.ocr_str = ''
+        for strline in tsv_df.values.tolist():
+            self.ocr_str += ' ' + strline[0].strip() + ' '
+        self.ocr_str = self.ocr_str.strip()
 
     def initialize_batch_receipts(data_folder_path, users_df):
         '''
@@ -115,9 +121,7 @@ class Receipt:
             list of the Receipt objects initialized based on receipts found in Data folder
         '''
         collected_doc_ids = set([did for did in users_df.loc[:, 'documentid']])
-        collected_doc_ids = collected_doc_ids.union(set([did[: -4] for did in os.listdir(data_folder_path + '/ocr-3') if did[-4] == '.csv']))
-        collected_doc_ids = collected_doc_ids.union(set([did[: -4] for did in os.listdir(data_folder_path + '/ocr-2') if did[-4] == '.csv']))
-        collected_doc_ids = collected_doc_ids.union(set([did[: -4] for did in os.listdir(data_folder_path + '/ocr') if did[-4] == '.csv']))
+        collected_doc_ids = collected_doc_ids.union(set([did[: -4] for did in os.listdir(data_folder_path + '/ocr-3') if did[-4] == '.tsv']))
 
         for did_raw in os.listdir(data_folder_path + '/img'):
             if did_raw[-4 :] == '.jpg':
