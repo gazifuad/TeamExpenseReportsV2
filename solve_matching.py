@@ -1,4 +1,6 @@
 import matplotlib
+import csv
+import pandas as pd
 import receipt_wrappers as rw
 import numpy as np
 import gurobipy as gp
@@ -65,6 +67,9 @@ class Matching:
     def solve_bipartite_matching(self):
         obj = [-1 * wgt for wgt in self.simple_edge_weights_vector]
 
+        print(self.simple_edge_weights_vector)
+
+        print([self.edge_names[ind] for ind in range(len(self.simple_edge_weights_vector)) if obj[ind] < -0.1])
 
         # A = [[0] * len(self.edge_names)] * len(self.receipt_did)
         A = np.zeros(shape=(len(self.receipt_users_did) + len(self.receipt_ocr_did), len(self.edge_names)))
@@ -93,6 +98,17 @@ class Matching:
         # print(len(A))
         # print(len(A[0]))
         
+        pd.DataFrame(A).to_csv("ARRAY.csv")
+    
+
+        with open('GFG', 'w') as f:
+            # using csv.writer method from CSV package
+            write = csv.writer(f)
+            
+            write.writerow(fields)
+            write.writerows(rows)
+
+
 
         b = [1] * (len(self.receipt_users_did) + len(self.receipt_ocr_did))
         

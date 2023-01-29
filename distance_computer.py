@@ -1,5 +1,7 @@
 import editdistance as ed
 import re
+from sklearn.metrics.pairwise import cosine_similarity
+from sklearn.feature_extraction.text import CountVectorizer
 
 SUB_RE = r'[!-&*-\-:-@\[-_()]+'
 SPLIT_RE = r' +'
@@ -31,5 +33,15 @@ def find_distance(pattern_str, text_str):
         # print(text_candidate)
         # print(ed.eval(pattern_candidate, text_candidate))
     return nearest_dist
+
+
+def cos_sim(pattern_str, text_str):
+    # Initialize vectorizer
+    vectorizer = CountVectorizer().fit_transform([pattern_str, text_str])
+
+    # compute and cosine similarity of texts
+    similarity = cosine_similarity(vectorizer[0:1], vectorizer[1:2])
+    
+    return similarity[0][0]
 
 # print(find_distance('RESTTORAN WAN SHENG', 'Hello there Obi Wan This is some sample text'))
