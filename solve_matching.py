@@ -12,7 +12,9 @@ class Matching:
     receipts = []
     receipt_did = []
     receipts_users = []
+    receipt_users_did = []
     receipts_ocr = []
+    receipt_ocr_did = []
 
     param_names = []
     param_coefs = []
@@ -29,7 +31,9 @@ class Matching:
         self.receipts = rw.Receipt.initialize_batch_receipts(self.data_folder_path, self.users_df)
         self.receipt_did = [rec.doc_id for rec in self.receipts]
         self.receipts_users = [rec for rec in self.receipts if rec.has_user]
+        self.receipt_users_did = [rec.doc_id for rec in self.receipts_users]
         self.receipts_ocr = [rec for rec in self.receipts if rec.has_ocr]
+        self.receipt_ocr_did = [rec.doc_id for rec in self.receipts_ocr]
         self.simple_edge_weights_vector = []
         for user_rec in self.receipts_users:
             for ocr_rec in self.receipts_ocr:
@@ -59,25 +63,52 @@ class Matching:
         plt.show()
 
     def solve_bipartite_matching(self):
-        obj = [1 / wgt for wgt in self.simple_edge_weights_vector]
+        obj = [-1 * wgt for wgt in self.simple_edge_weights_vector]
 
-        A = [[0] * len(self.edge_names)] * len(self.receipt_did)
+
+        # A = [[0] * len(self.edge_names)] * len(self.receipt_did)
+        A = np.zeros(shape=(len(self.receipt_users_did) + len(self.receipt_ocr_did), len(self.edge_names)))
         for edge_ind in range(len(self.edge_names)):
+            # print('-' * 10)
+            # print(edge_ind)
             edge = self.edge_names[edge_ind]
-            user_ind = self.receipt_did.index(edge[0])
-            ocr_ind = self.receipt_did.index(edge[1])
-            A[user_ind][edge_ind] = 1
-            A[user_ind][ocr_ind] = 1
+            user_ind = self.receipt_users_did.index(edge[0])
+            ocr_ind = self.receipt_ocr_did.index(edge[1])
+            # print(ocr_ind)
+            # A[user_ind][edge_ind] = 1
+            # A[ocr_ind][edge_ind] = 2
+            A[user_ind, edge_ind] = 1
+            A[len(self.receipt_users_did) + ocr_ind, edge_ind] = 1
+
+        print(A)
+        print(len(A.tolist()))
+        print(len(A.tolist()[0]))
+        print(np.sum(A, axis=1))
+        print(np.sum(A, axis=0))
+        print(np.mean(np.sum(A, axis=0)))
+        print(len(np.sum(A, axis=1)))
+        print(len(np.sum(A, axis=0)))
+        print(A.shape)
+        # print(A[0])
+        # print(len(A))
+        # print(len(A[0]))
         
-        b = [1] * len(self.receipt_did)
+
+        b = [1] * (len(self.receipt_users_did) + len(self.receipt_ocr_did))
         
         res = linprog(obj, A_ub=A, b_ub=b, bounds=[0, 1])
 
         print(res.x)
+        print(res.x[0])
+        print(res.fun)
+        print(res.status)
         
         soln_matches = [self.edge_names[ind] for ind in range(len(self.edge_names)) if res.x[ind] > 0.9]
         soln_hits = [edge[0] for edge in soln_matches if edge[0] == edge[1]]
         soln_accuracy = len(soln_hits) / len(self.receipts_users)
+        print([res.x[ind] for ind in range(len(self.edge_names)) if res.x[ind] > 0.01])
+        plt.hist([res.x[ind] for ind in range(len(self.edge_names))])
+        plt.show()
 
         return soln_matches, soln_hits, soln_accuracy
 
