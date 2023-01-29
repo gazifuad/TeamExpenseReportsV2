@@ -1,6 +1,8 @@
+import matplotlib
 import receipt_wrappers as rw
 import numpy as np
 import gurobipy as gp
+import matplotlib.pyplot as plt
 
 class Matching:
     data_folder_path = ''
@@ -50,12 +52,16 @@ class Matching:
         for edge_name in self.edge_names:
             wgt = sum([self.param_coefs[ind] * self.multi_edge_weights[edge_name][ind] for ind in range(n_param)])
             self.simple_edge_weights_vector.append(wgt)
+        plt.hist(self.simple_edge_weights_vector)
+        plt.show()
+
+        
 
     def solve_bipartite_matching(self):
         self.mdl = gp.Model('primal')
         # self.mdl.setParam('OutputFlag', False)
 
-        self.match_vars = self.mdl.addVars(self.edge_names, name='match_edge', vtype=gp.GRB.INTEGER, lb=0)
+        self.match_vars = self.mdl.addVars(self.edge_names, name='match_edge', lb=0)
 
         self.mdl.setObjective(gp.LinExpr(self.simple_edge_weights_vector, self.match_vars.select('*')), gp.GRB.MAXIMIZE)
 
@@ -63,11 +69,11 @@ class Matching:
         ocr_did = [rec.doc_id for rec in self.receipts_ocr]
 
 
-        self.mdl.addConstrs(gp.quicksum(self.match_vars[user, ocr] for user in users_did)
+        self.mdl.addConstrs(gp.quicksum(self.match_vars[(user, ocr)] for user in users_did)
                     <= 1
                     for ocr in ocr_did)
 
-        self.mdl.addConstrs(gp.quicksum(self.match_vars[user, ocr] for ocr in ocr_did)
+        self.mdl.addConstrs(gp.quicksum(self.match_vars[(user, ocr)] for ocr in ocr_did)
                     <= 1
                     for user in users_did)
 
@@ -78,7 +84,16 @@ class Matching:
             raise Exception('mdl attribute not optimized.')
         
         soln_matches = [edge for edge in self.edge_names if self.match_vars[edge].X > 0.99]
-        soln_hits = [edge[0] for edge in self.edge_names if edge[0] == edge[1]]
+        soln_hits = [edge[0] for edge in soln_matches if edge[0] == edge[1]]
         soln_accuracy = len(soln_hits) / len(self.receipts_users)
+
+        print([self.match_vars[edge].X for edge in self.edge_names])
+        print(sum([self.match_vars[edge].X for edge in self.edge_names]))
+
+        plt.hist([self.match_vars[edge].X for edge in self.edge_names])
+        plt.show()
+
+        print(self.simple_edge_weights_vector[0])
+        print(self.multi_edge_weights[self.edge_names[0]])
 
         return soln_matches, soln_hits, soln_accuracy

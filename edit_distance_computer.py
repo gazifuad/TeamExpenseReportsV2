@@ -23,8 +23,13 @@ def find_distance(pattern_str, text_str):
     text = tokenize(text_str)
     tokens_in_pattern = len(pattern)
     nearest_dist = float('inf')
-    for ind in (range(len(text))):
-        pattern_candidate = ''.join(pattern[ind: ind+tokens_in_pattern])
+    for ind in (range(len(text) - tokens_in_pattern)):
+        pattern_candidate = ''.join(pattern)
         text_candidate = ''.join(text[ind: ind+tokens_in_pattern])
         nearest_dist = min(nearest_dist, ed.eval(pattern_candidate, text_candidate))
+        # print(pattern_candidate)
+        # print(text_candidate)
+        # print(ed.eval(pattern_candidate, text_candidate))
     return nearest_dist
+
+# print(find_distance('RESTTORAN WAN SHENG', 'Hello there Obi Wan This is some sample text'))
